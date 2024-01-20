@@ -86,12 +86,12 @@ static void execute_child_process(t_data *data)
 	if (data->child == 0)
 	{
 		// First child: Use the initial input file descriptor and the write-end of the first pipe
-		redirect_io(data->fd_in, data->pipe[1], data);
+		redirect_io(data->input_fd, data->pipe[1], data);
 	} 
-	else if (data->child == data->nb_cmds - 1)
+	else if (data->child == data->cmd_count - 1)
 	{
 		// Last child: Use the read-end of the last pipe and the final output file descriptor
-		redirect_io(data->pipe[2 * data->child - 2], data->fd_out, data);
+		redirect_io(data->pipe[2 * data->child - 2], data->output_fd, data);
 	}
 	else {
 		// Middle child: Use the read-end of the current pipe and the write-end of the next pipe
@@ -114,12 +114,6 @@ static void execute_child_process(t_data *data)
 
 
 
-
-/* execute_parent_process:
-*	Waits for the children processes to finish and fetches the status of the last
-*	child.
-*	Returns the exit status code of the last child process.
-*/
 
 
 /**
@@ -149,9 +143,9 @@ static int	execute_parent_process(t_data *data)
 	while (data->child >= 0)
 	{
 		wpid = waitpid(data->pids[data->child], &status, 0);
-		if (wpid == data->pids[data->nb_cmds - 1])
+		if (wpid == data->pids[data->cmd_count - 1])
 		{
-			if ((data->child == (data->nb_cmds - 1)) && WIFEXITED(status))
+			if ((data->child == (data->cmd_count - 1)) && WIFEXITED(status))
 				exit_code = WEXITSTATUS(status);
 		}
 		data->child--;
@@ -160,23 +154,6 @@ static int	execute_parent_process(t_data *data)
 	free(data->pids);
 	return (exit_code);
 }
-
-
-
-//  * Functionality:
-//  *   - Sets up a pipe and forks child processes for each command in the pipeline.
-//  *   - Each child process handles the execution of one command.
-//  *   - The parent process waits for all child processes to complete and collects their exit codes.
-//  *
-//  * Returns:
-//  *   The exit code of the last child in the pipeline.
-//  *
-//  * Notes:
-//  *   - The function creates a pipe using the pipe system call and checks for errors.
-//  *   - Each command and its options are parsed and executed in separate child processes.
-//  *   - The function handles errors in pipe creation, command parsing, and process forking.
-//  *   - If a heredoc is used, the temporary file is removed after execution.
-
 
 /**
  * Manages the execution of a pipeline of commands.
@@ -197,49 +174,27 @@ static int pipex(t_data *data)
 {
 	int exit_code;
 
-	// Create a pipe and check for errors
-	if (pipe(data->pipe) == -1) {
+	if (pipe(data->pipe) == -1)
 		exit_error(msg("pipe", ": ", strerror(errno), 1), data);
-	}
-
-	// Fork child processes for each command in the pipeline
 	data->child = 0;
-	while (data->child < data->nb_cmds) {
-		// Parse the command and its options
-		data->cmd_options = ft_split(data->av[data->child + 2 + data->heredoc], ' ');
-		if (!data->cmd_options) {
+	while (data->child < data->cmd_count)
+	{
+		data->cmd_options = ft_split(data->av[data->child + 2 + data->heredoc_flag], ' ');
+		if (!data->cmd_options)
 			exit_error(msg("unexpected error", "", "", 1), data);
-		}
-
-		// Get the full path of the command
 		data->cmd_path = get_cmd(data->cmd_options[0], data);
-
-		// Fork a new process
 		data->pids[data->child] = fork();
-		if (data->pids[data->child] == -1) {
-			// Handle errors in fork
+		if (data->pids[data->child] == -1)
 			exit_error(msg("fork", ": ", strerror(errno), 1), data);
-		} else if (data->pids[data->child] == 0) {
-			// Child process: Execute the command
+		else if (data->pids[data->child] == 0)
 			execute_child_process(data);
-		}
-
-		// Free allocated strings for the current command
 		free_strs(data->cmd_path, data->cmd_options);
-
-		// Move to the next command
 		data->child++;
 	}
-
-	// Parent process: Wait for children and get the exit code
 	exit_code = execute_parent_process(data);
-
-	// Remove temporary file if heredoc was used
-	if (data->heredoc == 1) {
+	if (data->heredoc_flag == 1)
 		unlink(".heredoc.tmp");
-	}
-
-	return exit_code;
+	return (exit_code);
 }
 
 // static int pipex(t_data *data)
@@ -249,7 +204,7 @@ static int pipex(t_data *data)
 //		 exit_error(msg("pipe", ": ", strerror(errno), 1), data);
 //	 }
 //	 data->child = 0;
-//	 while (data->child < data->nb_cmds) {
+//	 while (data->child < data->cmd_count) {
 //		 data->cmd_options = ft_split(data->av[data->child + 2 + data->heredoc], ' ');
 //		 if (!data->cmd_options) {
 //			 exit_error(msg("unexpected error", "", "", 1), data);
@@ -271,34 +226,6 @@ static int pipex(t_data *data)
 //	 return exit_code;
 // }
 
-
-
-
-
-/* 
- * main:
- *   Entry point for the pipex program. It parses arguments, initializes necessary structures,
- *   and launches the pipex process to handle command execution.
- *
- * Parameters:
- *   ac - Argument count.
- *   av - Argument vector (array of strings).
- *   envp - Environment variables.
- *
- * Functionality:
- *   - Validates the number of arguments and provides usage messages if the arguments are incorrect.
- *   - Checks for a valid environment.
- *   - Initializes the data structure for pipex.
- *   - Calls the pipex function to execute the commands and returns its exit code.
- *
- * Returns:
- *   The exit code of the last command executed by pipex or an error code in case of invalid input.
- *
- * Notes:
- *   - The program supports a 'here_doc' feature which alters the expected argument format.
- *   - Usage messages guide the user on how to properly invoke the program.
- */
-
 /**
  * Entry point for the Pipex program.
  *
@@ -309,41 +236,36 @@ static int pipex(t_data *data)
  * Once initialized, it invokes the pipex function to manage the execution of commands within a pipeline.
  * Finally, it returns the exit code from the last command executed by Pipex.
  *
- * @param ac The count of command-line arguments.
- * @param av The vector of command-line arguments.
+ * @param argc The count of command-line arguments.
+ * @param argv The vector of command-line arguments.
  * @param envp The environment variables.
  *
  * @return The exit code of the last command executed by Pipex, or an error code in case of invalid input or setup failure.
  */
-int main(int ac, char **av, char **envp)
+int main(int argc, char **argv, char **envp)
 {
 	t_data data;
 	int exit_code;
 
-	// Validate argument count and provide usage instructions if necessary
-	if (ac < 5) {
-		if (ac >= 2 && !ft_strncmp("here_doc", av[1], 9))
+	if (argc < 5)
+	{
+		if (argc >= 2 && !ft_strncmp("here_doc", argv[1], 9))
 			return (msg("Usage: ", "./pipex here_doc LIMITER cmd1 cmd2 ... cmdn file2.", "", 1));
 		return (msg("Usage: ", "./pipex file1 cmd1 cmd2 ... cmdn file2.", "", 1));
 	}
-	else if (ac < 6 && !ft_strncmp("here_doc", av[1], 9))
+	else if (argc < 6 && !ft_strncmp("here_doc", argv[1], 9))
 		return (msg("Usage: ", "./pipex here_doc LIMITER cmd1 cmd2 ... cmdn file2.", "", 1));
-
-	// Check for valid environment
 	if (!envp || envp[0][0] == '\0')
 		exit_error(msg("Unexpected error.", "", "", 1), &data);
-
-	// Initialize data structure and start the pipex process
-	data = init(ac, av, envp);
+	data = init(argc, argv, envp);
 	exit_code = pipex(&data);
 
-	// Return the exit code from pipex
 	return (exit_code);
 }
 
 
 
-
+//checar refs do msgs e trocar função
 
 
 

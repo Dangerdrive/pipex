@@ -11,17 +11,62 @@
  * Functionality:
  *   - Iterates through the pipe file descriptors array and closes each file descriptor.
  */
+
+/**
+ * Closes all file descriptors associated with the pipes used in pipex.
+ *
+ * This function iterates through the array of file descriptors stored in the 
+ * `pipe` field of the `t_data` structure and closes each one. The number of 
+ * file descriptors to close is determined by the number of commands minus one,
+ * multiplied by two (since each pipe consists of two file descriptors).
+ *
+ * @param[in,out] data Pointer to a t_data structure containing the pipe file
+ * descriptors and the number of commands.
+ */
 static void close_pipe_fds(t_data *data)
 {
 	int	i;
 
 	i = 0;
-	while (i < (data->nb_cmds - 1) * 2)
+	while (i < (data->cmd_count - 1) * 2)
 	{
 		close(data->pipe[i]);
 		i++;
 	}
 }
+
+/* 
+ * close_fds:
+ *   Closes the input and output file descriptors, as well as any pipe file descriptors.
+ *
+ * Parameters:
+ *   data - Pointer to the t_data structure containing the file descriptors.
+ *
+ * Functionality:
+ *   - Closes the input and output file descriptors if they are valid.
+ *   - Calls close_pipe_fds to close all pipe file descriptors.
+ */
+
+/**
+ * Closes all file descriptors used in the pipex process.
+ *
+ * This function is responsible for closing the input and output file descriptors,
+ * as well as all pipe file descriptors associated with the pipex process. It checks
+ * if the input and output file descriptors are valid (not equal to -1) before attempting
+ * to close them. The function then calls `close_pipe_fds` to close all pipe file descriptors.
+ *
+ * @param[in,out] data Pointer to a t_data structure that contains the file descriptors
+ * for input, output, and pipes.
+ */
+void close_fds(t_data *data)
+{
+	if (data->input_fd != -1)
+		close(data->input_fd);
+	if (data->output_fd != -1)
+		close(data->output_fd);
+	close_pipe_fds(data);
+}
+
 
 
 /* 
@@ -69,9 +114,8 @@ void exit_error(int error_status, t_data *data)
 			free(data->cmd_path);
 			data->cmd_path = NULL;
 		}
-		 
 	}
-	if (data->heredoc == 1)
+	if (data->heredoc_flag == 1)
 		unlink(".heredoc.tmp");
 	exit(error_status);
 }
@@ -101,25 +145,7 @@ int msg(char *str1, char *str2, char *str3, int erno)
 }
 
 
-/* 
- * close_fds:
- *   Closes the input and output file descriptors, as well as any pipe file descriptors.
- *
- * Parameters:
- *   data - Pointer to the t_data structure containing the file descriptors.
- *
- * Functionality:
- *   - Closes the input and output file descriptors if they are valid.
- *   - Calls close_pipe_fds to close all pipe file descriptors.
- */
-void close_fds(t_data *data)
-{
-	if (data->fd_in != -1)
-		close(data->fd_in);
-	if (data->fd_out != -1)
-		close(data->fd_out);
-	close_pipe_fds(data);
-}
+
 
 
 /* 

@@ -6,15 +6,15 @@
 /*   By: fde-alen <fde-alen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/17 21:09:15 by fde-alen          #+#    #+#             */
-/*   Updated: 2024/01/10 18:32:38 by fde-alen         ###   ########.fr       */
+/*   Updated: 2024/01/19 19:23:01 by fde-alen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef FT_PRINTF_H
 # define FT_PRINTF_H
 
-# define STDOUT_FILENO (1)
-# define STDERR_FILENO (2)
+// # define STDOUT_FILENO (1)
+// # define STDERR_FILENO (2)
 
 # define NO_FLAG (0)
 
@@ -34,6 +34,7 @@
 // char		*ft_uitoa_base(unsigned long num, int base, const char format);
 // int		ft_unumlen_base(unsigned long num, int base);
 //
+
 // print type functions
 int			ft_print_char(int fd, char c);
 int			ft_print_hex(unsigned int num, const char format, const char flag);

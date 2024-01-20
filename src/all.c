@@ -213,17 +213,17 @@ char *get_cmd(char *cmd, t_data *data)
  */
 void get_input_file(t_data *data)
 {
-    if (data->heredoc == 1)
+    if (data->heredoc_flag == 1)
     {
         get_heredoc(data);
-        data->fd_in = open(".heredoc.tmp", O_RDONLY);
-        if (data->fd_in == -1)
+        data->input_fd = open(".heredoc.tmp", O_RDONLY);
+        if (data->input_fd == -1)
             exit_error(msg("here_doc", ": ", strerror(errno), 1), data);
     }
     else
     {
-        data->fd_in = open(data->av[1], O_RDONLY, 644);
-        if (data->fd_in == -1)
+        data->input_fd = open(data->av[1], O_RDONLY, 644);
+        if (data->input_fd == -1)
             msg(strerror(errno), ": ", data->av[1], 1);
     }
 }
@@ -244,11 +244,11 @@ void get_input_file(t_data *data)
 void get_output_file(t_data *data)
 {
     if (data->heredoc == 1)
-        data->fd_out = open(data->av[data->ac - 1], O_WRONLY | O_CREAT | O_APPEND, 0644);
+        data->output_fd = open(data->av[data->ac - 1], O_WRONLY | O_CREAT | O_APPEND, 0644);
     else
-        data->fd_out = open(data->av[data->ac - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        data->output_fd = open(data->av[data->ac - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
 
-    if (data->fd_out == -1)
+    if (data->output_fd == -1)
         msg(strerror(errno), ": ", data->av[data->ac - 1], 1);
 }
 
@@ -322,10 +322,10 @@ static t_data clean_init(void)
     data.ac = -1;
     data.av = NULL;
     data.heredoc = 0;
-    data.fd_in = -1;
-    data.fd_out = -1;
+    data.input_fd = -1;
+    data.output_fd = -1;
     data.pipe = NULL;
-    data.nb_cmds = -1;
+    data.cmd_count = -1;
     data.child = -1;
     data.pids = NULL;
     data.cmd_options = NULL;
@@ -350,7 +350,7 @@ static void generate_pipes(t_data *data)
     int i;
 
     i = 0;
-    while (i < data->nb_cmds - 1)
+    while (i < data->cmd_count - 1)
     {
         if (pipe(data->pipe + 2 * i) == -1)
             exit_error(msg("Could not create pipe", "", "", 1), data);
@@ -394,12 +394,12 @@ t_data init(int ac, char **av, char **envp)
     get_input_file(&data);
     get_output_file(&data);
 
-    data.nb_cmds = ac - 3 - data.heredoc;
-    data.pids = malloc(sizeof(*data.pids) * data.nb_cmds);
+    data.cmd_count = ac - 3 - data.heredoc;
+    data.pids = malloc(sizeof(*data.pids) * data.cmd_count);
     if (!data.pids)
         exit_error(msg("PID error", strerror(errno), "", 1), &data);
 
-    data.pipe = malloc(sizeof(*data.pipe) * 2 * (data.nb_cmds - 1));
+    data.pipe = malloc(sizeof(*data.pipe) * 2 * (data.cmd_count - 1));
     if (!data.pipe)
         exit_error(msg("Pipe error", "", "", 1), &data);
 
@@ -478,12 +478,12 @@ static void child(t_data *data)
 	if (data->child == 0)
 	{
 		// First child: Use the initial input file descriptor and the write-end of the first pipe
-		redirect_io(data->fd_in, data->pipe[1], data);
+		redirect_io(data->input_fd, data->pipe[1], data);
 	} 
-	else if (data->child == data->nb_cmds - 1)
+	else if (data->child == data->cmd_count - 1)
 	{
 		// Last child: Use the read-end of the last pipe and the final output file descriptor
-		redirect_io(data->pipe[2 * data->child - 2], data->fd_out, data);
+		redirect_io(data->pipe[2 * data->child - 2], data->output_fd, data);
 	}
 	else {
 		// Middle child: Use the read-end of the current pipe and the write-end of the next pipe
@@ -524,9 +524,9 @@ static int	parent(t_data *data)
 	while (data->child >= 0)
 	{
 		wpid = waitpid(data->pids[data->child], &status, 0);
-		if (wpid == data->pids[data->nb_cmds - 1])
+		if (wpid == data->pids[data->cmd_count - 1])
 		{
-			if ((data->child == (data->nb_cmds - 1)) && WIFEXITED(status))
+			if ((data->child == (data->cmd_count - 1)) && WIFEXITED(status))
 				exit_code = WEXITSTATUS(status);
 		}
 		data->child--;
@@ -569,7 +569,7 @@ static int pipex(t_data *data)
 
     // Fork child processes for each command in the pipeline
     data->child = 0;
-    while (data->child < data->nb_cmds) {
+    while (data->child < data->cmd_count) {
         // Parse the command and its options
         data->cmd_options = ft_split(data->av[data->child + 2 + data->heredoc], ' ');
         if (!data->cmd_options) {
@@ -687,7 +687,7 @@ static void close_pipe_fds(t_data *data)
     int i;
 
     i = 0;
-    while (i < (data->nb_cmds - 1) * 2)
+    while (i < (data->cmd_count - 1) * 2)
     {
         close(data->pipe[i]);
         i++;
@@ -763,10 +763,10 @@ int msg(char *str1, char *str2, char *str3, int erno)
  */
 void close_fds(t_data *data)
 {
-    if (data->fd_in != -1)
-        close(data->fd_in);
-    if (data->fd_out != -1)
-        close(data->fd_out);
+    if (data->input_fd != -1)
+        close(data->input_fd);
+    if (data->output_fd != -1)
+        close(data->output_fd);
     close_pipe_fds(data);
 }
 

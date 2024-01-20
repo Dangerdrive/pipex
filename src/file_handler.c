@@ -16,17 +16,17 @@
  */
 void get_input_file(t_data *data)
 {
-    if (data->heredoc == 1)
+    if (data->heredoc_flag == 1)
     {
         handle_heredoc(data);
-        data->fd_in = open(".heredoc.tmp", O_RDONLY);
-        if (data->fd_in == -1)
+        data->input_fd = open(".heredoc.tmp", O_RDONLY);
+        if (data->input_fd == -1)
             exit_error(msg("here_doc", ": ", strerror(errno), 1), data);
     }
     else
     {
-        data->fd_in = open(data->av[1], O_RDONLY, 644);
-        if (data->fd_in == -1)
+        data->input_fd = open(data->av[1], O_RDONLY, 644);
+        if (data->input_fd == -1)
             msg(strerror(errno), ": ", data->av[1], 1);
     }
 }
@@ -46,12 +46,12 @@ void get_input_file(t_data *data)
  */
 void get_output_file(t_data *data)
 {
-    if (data->heredoc == 1)
-        data->fd_out = open(data->av[data->ac - 1], O_WRONLY | O_CREAT | O_APPEND, 0644);
+    if (data->heredoc_flag == 1)
+        data->output_fd = open(data->av[data->ac - 1], O_WRONLY | O_CREAT | O_APPEND, 0644);
     else
-        data->fd_out = open(data->av[data->ac - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        data->output_fd = open(data->av[data->ac - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
 
-    if (data->fd_out == -1)
+    if (data->output_fd == -1)
         msg(strerror(errno), ": ", data->av[data->ac - 1], 1);
 }
 

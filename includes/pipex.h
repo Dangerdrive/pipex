@@ -6,23 +6,24 @@
 /*   By: fde-alen <fde-alen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/07 22:36:23 by fde-alen          #+#    #+#             */
-/*   Updated: 2024/01/08 23:43:15 by fde-alen         ###   ########.fr       */
+/*   Updated: 2024/01/19 20:42:41 by fde-alen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-
 
 #ifndef PIPEX_H
 # define PIPEX_H
 
-# include <fcntl.h>
 # include <stdlib.h>
 # include <stdio.h>
-# include <unistd.h>
-# include <sys/wait.h>
 # include <string.h>
 # include <errno.h>
-# include "libft.h"
+
+# include <fcntl.h>
+# include <unistd.h>
+# include <sys/wait.h>
+
+# include "../libs/libft/libft.h"
+# include "../libs/ft_printf/ft_printf.h"
 
 /*  Data    */
 typedef struct s_data
@@ -30,11 +31,11 @@ typedef struct s_data
 	char	**envp;
 	char	**av;
 	int		ac;
-	int		heredoc;
-	int		fd_in;
-	int		fd_out;
+	int		heredoc_flag;
+	int		input_fd;
+	int		output_fd;
 	int		*pipe;
-	int		nb_cmds;
+	int		cmd_count;
 	int		child;
 	int		*pids;
 	char	**cmd_options;

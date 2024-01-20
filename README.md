@@ -1,5 +1,13 @@
 For me, one thing that made it more difficult was a lack of understandment of unix processes. It was not that hard to understand pipes, 
 
+```c
+int main(int argc, char **argv, char **envp)
+{
+    // Your code here
+}
+```
+
+
 Command Execution with execve()
 execve() is a system call used to execute a program. It replaces the current process image with a new process image, specified by a path, and passes arguments and environment variables to it. Key components include:
 
@@ -13,8 +21,26 @@ Each directory in this list is a place where your system will search for executa
 
 So in your program, you will get this string and split it into an array of strings. Then you will search each directory in the array for the executable file you want to run.
 
+You will get PATH from the char **envp parameter. Envp stands for environment pointer.
 
+The envp parameter in a C program contains an array of strings representing the environment variables of the program. These environment variables are key-value pairs that provide various information about the program's environment. The PATH variable is just one of many possible environment variables. Here are some common ones:
 
+HOME: The path to the current user's home directory.
+USER: The username of the user running the program.
+SHELL: The path to the user's preferred shell (e.g., /bin/bash).
+LANG: Specifies the language and character encoding used by the system.
+PWD: The current working directory when the program was started.
+OLDPWD: The previous working directory.
+HOSTNAME: The name of the host system.
+DISPLAY: Information about the display (used in graphical environments).
+TERM: The terminal type being used.
+EDITOR: The default text editor.
+PS1, PS2: Defines the primary and secondary prompts in the shell.
+PATH: The directories where executables are searched for.
+LD_LIBRARY_PATH: Search path for dynamic libraries.
+TZ: Timezone setting.
+
+you can list all environment variables by typing ```env``` in your terminal.
 
 
 
@@ -43,3 +69,59 @@ The parent process should wait for both child processes to complete.
 Error Handling: Properly handling errors for system calls and edge cases is an important part of the project.
 
 Bonus Features (if applicable): These might include handling multiple pipes (more than two commands in the pipeline), here-documents, and additional error management.
+
+
+
+
+Heredoc, short for "here document", is a feature found in many Unix shells and programming languages, including Bash and Python. It allows you to create a multiline string or stream of input directly within the command line or a script, making it very useful for running commands that require multiline input or embedding a block of text.
+
+In the context of shell scripting, heredoc is often used to feed input to commands interactively or to pass multiline strings to commands. Here's the basic syntax for heredoc in a shell:
+
+bash
+Copy code
+command <<DELIMITER
+multiline
+text
+DELIMITER
+In this syntax, command is the command you want to run, DELIMITER is an identifier you choose to mark the beginning and end of the heredoc, and multiline\ntext is the content you want to pass to the command. The DELIMITER can be any string, as long as it is the same at the beginning and end of the heredoc section.
+
+Example Usage
+Feeding Input to a Command:
+Suppose you want to provide multiline input to a command like cat:
+
+bash
+Copy code
+cat <<EOF
+Line 1
+Line 2
+Line 3
+EOF
+This would output:
+
+mathematica
+Copy code
+Line 1
+Line 2
+Line 3
+Using with Scripts:
+Heredoc can be very useful in scripts to embed large blocks of text. For example, you might use it to write a configuration file:
+
+bash
+Copy code
+cat <<EOF > config.txt
+user=example
+path=/var/example
+EOF
+This creates a file config.txt with the provided content.
+
+Piping to Another Command:
+You can also pipe the output of a heredoc to another command. For example:
+
+bash
+Copy code
+cat <<EOF | grep 'Line'
+Line 1
+Something else
+Line 2
+EOF
+This will use grep to filter out lines that contain the word "Line".
