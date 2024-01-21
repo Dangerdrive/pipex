@@ -3,7 +3,7 @@
 #include "pipex.h"
 
 
-/* 
+/*
  * handle_heredoc:
  *   Handles the 'here_doc' functionality by reading input from the user and storing it in a temporary file.
  *
@@ -15,6 +15,25 @@
  *   - Reads lines from standard input until the specified limiter is found.
  *   - Writes the lines to the temporary file unless they match the limiter.
  *   - Closes the temporary file and the duplicated standard input file descriptor upon completion.
+ */
+
+/**
+ * Opens the output file and sets its file descriptor in the data structure.
+ *
+ * This function determines the correct flags for opening the output file based on
+ * whether the 'here_doc' feature is being used. If 'here_doc' is enabled, it opens
+ * the file in append mode (O_APPEND), allowing the contents to be added to the end
+ * of the file. If 'here_doc' is not enabled, it opens the file in truncate mode
+ * (O_TRUNC), which clears the file's existing contents. In both cases, the file
+ * is opened for writing (O_WRONLY) and will be created (O_CREAT) if it doesn't
+ * already exist, with standard permissions set (0644).
+ *
+ * If the file cannot be opened, an error message is printed to standard output
+ * using `ft_printf`, displaying the corresponding error from `errno` and the file's name.
+ *
+ * @param[in,out] data A pointer to the t_data structure containing information
+ *                     about the pipeline execution, including the heredoc flag
+ *                     and file descriptors for input and output files.
  */
 static void handle_heredoc(t_data *data)
 {
@@ -43,7 +62,7 @@ static void handle_heredoc(t_data *data)
 	close(tmp_fd);
 }
 
-/* 
+/*
  * get_input_file:
  *   Sets up the input file descriptor for pipex.
  *
@@ -66,7 +85,6 @@ void get_input_file(t_data *data)
 			exit_error(ERROR, data);
 			ft_printf("pipex: here_doc: %s\n", strerror(errno));
 		}
-			
 	}
 	else
 	{
@@ -78,7 +96,7 @@ void get_input_file(t_data *data)
 	}
 }
 
-/* 
+/*
  * get_output_file:
  *   Opens or creates the output file for pipex.
  *
@@ -94,9 +112,11 @@ void get_input_file(t_data *data)
 void get_output_file(t_data *data)
 {
 	if (data->heredoc_flag == 1)
-		data->output_fd = open(data->av[data->ac - 1], O_WRONLY | O_CREAT | O_APPEND, 0644);
+		data->output_fd = open(data->av[data->ac - 1],
+			O_WRONLY | O_CREAT | O_APPEND, 0644);
 	else
-		data->output_fd = open(data->av[data->ac - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		data->output_fd = open(data->av[data->ac - 1],
+			O_WRONLY | O_CREAT | O_TRUNC, 0644);
 
 	if (data->output_fd == -1)
 		ft_printf("pipex: %s: %s\n", strerror(errno), data->av[data->ac - 1]);
