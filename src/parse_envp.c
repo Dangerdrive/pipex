@@ -15,7 +15,7 @@
  * @param[in] envp Array of environment variables, each as a string.
  *
  * @return A pointer to a newly allocated string containing the value of PATH.
- *     Returns NULL if PATH is not found or in case of memory allocation failure.
+ *	 Returns NULL if PATH is not found or in case of memory allocation failure.
  */
 static char *extract_path_var(char **envp)
 {
@@ -35,7 +35,7 @@ static char *extract_path_var(char **envp)
 	return (path);
 }
 
-// /* 
+// /*
 //  * make_usable_paths:
 //  *   Appends a '/' character at the end of each path string in the array.
 //  *
@@ -58,12 +58,12 @@ static char *extract_path_var(char **envp)
 //   tmp = NULL;
 //   while (paths[i])
 //   {
-//     tmp = paths[i];
-//     paths[i] = ft_strjoin(paths[i], "/");
-//     //free_strs(tmp, NULL);
-//     free(tmp);
-//    tmp = NULL;
-//     i++;
+//	 tmp = paths[i];
+//	 paths[i] = ft_strjoin(paths[i], "/");
+//	 //free_strs(tmp, NULL);
+//	 free(tmp);
+//	tmp = NULL;
+//	 i++;
 //   }
 //   return (paths);
 // }
@@ -71,7 +71,7 @@ static char *extract_path_var(char **envp)
 
 
 
-/* 
+/*
  * get_env_paths:
  *   Retrieves the PATH environment variable and splits it into individual paths.
  *
@@ -103,38 +103,38 @@ static char *extract_path_var(char **envp)
  * @param[in] envp The array of environment variables.
  *
  * @return An array of strings, each representing a path from the PATH environment
- *     variable with a '/' appended, or NULL if any allocation fails.
+ *	 variable with a '/' appended, or NULL if any allocation fails.
  */
 static char **get_env_paths(char **envp)
 {
-    char *env_path_str;
-    char **paths;
-    int i;
-    char *tmp;
+	char *env_path_str;
+	char **paths;
+	int i;
+	char *tmp;
 
-    i = 0;
-    env_path_str = extract_path_var(envp);
-    if (!env_path_str)
-        return (NULL);
-    paths = ft_split(env_path_str, ':');
-    free(env_path_str);
-    if (!paths)
-        return (NULL);
-    while (paths[i])
-    {
-        tmp = paths[i];
-        paths[i] = ft_strjoin(paths[i], "/");
-        free(tmp);
-        if (!paths[i])
-            return (NULL);
-        i++;
-    }
-    return (paths);
+	i = 0;
+	env_path_str = extract_path_var(envp);
+	if (!env_path_str)
+		return (NULL);
+	paths = ft_split(env_path_str, ':');
+	free(env_path_str);
+	if (!paths)
+		return (NULL);
+	while (paths[i])
+	{
+		tmp = paths[i];
+		paths[i] = ft_strjoin(paths[i], "/");
+		free(tmp);
+		if (!paths[i])
+			return (NULL);
+		i++;
+	}
+	return (paths);
 }
 
 
 
-/* 
+/*
  * get_cmd_path:
  *   Searches for the specified command in the given paths.
  *
@@ -163,39 +163,42 @@ static char **get_env_paths(char **envp)
  * @param cmd The command name to search for.
  * @param paths An array of directory paths to search the command in.
  * @return A dynamically allocated string containing the full path to the command if found,
- *     otherwise returns NULL. The caller is responsible for freeing this string.
+ *	 otherwise returns NULL. The caller is responsible for freeing this string.
  *
  * Note: If the command is not found in any of the provided paths, or if there is an
- *     error during path construction, the function returns NULL. If an error occurs,
- *     the function also frees the paths array and exits with an error message.
+ *	 error during path construction, the function returns NULL. If an error occurs,
+ *	 the function also frees the paths array and exits with an error message.
  */
 static char *get_cmd_path(char *cmd, char **paths)
 {
-    int i;
-    char *cmd_path;
+	int i;
+	char *cmd_path;
 
-    cmd_path = NULL;
-    i = 0;
-    while (paths[i])
-    {
-        cmd_path = ft_strjoin(paths[i], cmd);
-        if (!cmd_path)
-        {
-            free_strs(NULL, paths);
-            exit_error(msg("unexpected error", "", "", 1), NULL);
-        }
-        if (access(cmd_path, F_OK | X_OK) == 0)
-            return (cmd_path);
-        //free_strs(cmd_path, NULL);
-        free(cmd_path);
-        cmd_path = NULL;
-        i++;
-    }
-    return (NULL);
+	cmd_path = NULL;
+	i = 0;
+	while (paths[i])
+	{
+		cmd_path = ft_strjoin(paths[i], cmd);
+		if (!cmd_path)
+		{
+			free_strs(NULL, paths);
+			//printf("pipex: %s\n", strerror(errno));
+			ft_printf("pipex: cmd path error");
+			exit_error(ERROR, NULL);
+
+		}
+		if (access(cmd_path, F_OK | X_OK) == 0)
+			return (cmd_path);
+		//free_strs(cmd_path, NULL);
+		free(cmd_path);
+		cmd_path = NULL;
+		i++;
+	}
+	return (NULL);
 }
 
 
-/* 
+/*
  * get_cmd:
  *   Retrieves the full path of a given command from the environment paths.
  *
@@ -214,17 +217,18 @@ static char *get_cmd_path(char *cmd, char **paths)
  */
 char *get_cmd(char *cmd, t_data *data)
 {
-    char **env_paths;
-    char *cmd_path;
+	char **env_paths;
+	char *cmd_path;
 
-    if (access(cmd, F_OK | X_OK) == 0)
-        return (ft_strdup(cmd));
-    env_paths = get_env_paths(data->envp);
-    if (!env_paths)
-        return (NULL);
-    cmd_path = get_cmd_path(cmd, env_paths);
-    if (!cmd_path)
-        msg("command not found", ": ", data->av[data->child + 2], 1);
-    free_strs(NULL, env_paths);
-    return (cmd_path);
+	if (access(cmd, F_OK | X_OK) == 0)
+		return (ft_strdup(cmd));
+	env_paths = get_env_paths(data->envp);
+	if (!env_paths)
+		return (NULL);
+	cmd_path = get_cmd_path(cmd, env_paths);
+	if (!cmd_path)
+		ft_printf("pipex: %s%s%s\n",
+		msg("command not found", ": ", data->av[data->child + 2], 1);
+	free_strs(NULL, env_paths);
+	return (cmd_path);
 }

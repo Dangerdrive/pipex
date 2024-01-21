@@ -7,9 +7,9 @@
  *
  * This function is responsible for setting initial values for all fields in the t_data structure.
  * It sets pointers to NULL, file descriptors to -1, and integer values to 0 or -1 as appropriate.
- * This initialization is crucial to ensure that the data structure starts in a known state, 
- * preventing undefined behavior from uninitialized values. The initialized structure is used to manage 
- * various aspects of the pipex program, such as environment variables, command arguments, file descriptors, 
+ * This initialization is crucial to ensure that the data structure starts in a known state,
+ * preventing undefined behavior from uninitialized values. The initialized structure is used to manage
+ * various aspects of the pipex program, such as environment variables, command arguments, file descriptors,
  * and child process management.
  *
  * @return An instance of t_data structure with all fields initialized to default values.
@@ -33,7 +33,7 @@ static t_data initialize_data(void)
 	return (data);
 }
 
-/* 
+/*
  * create_pipes:
  *   Creates the necessary number of pipes for inter-process communication in pipex.
  *
@@ -55,16 +55,16 @@ static void create_pipes(t_data *data)
 		if (pipe(data->pipe + 2 * i) == -1)
 		{
 			exit_error(ERROR, data);
-			ft_putendl_fd("Could not create pipe", 2);
-		}	
+			ft_printf("Could not create pipe\n");
+		}
 		i++;
 	}
 }
 
 
-/* 
+/*
  * init:
- *   Initializes a t_data structure for pipex, sets up input and output file descriptors, 
+ *   Initializes a t_data structure for pipex, sets up input and output file descriptors,
  *   and allocates necessary resources for pipes and process IDs.
  *
  * Parameters:
@@ -98,13 +98,17 @@ t_data init_data(int ac, char **av, char **envp)
 	data.cmd_count = ac - 3 - data.heredoc_flag;
 	data.pids = malloc(sizeof(*data.pids) * data.cmd_count);
 	if (!data.pids)
+	{
+		exit_error(ERROR, &data);
+		ft_printf("PID error\n");
+	}
 		exit_error(msg("PID error", strerror(errno), "", 1), &data);
 	data.pipe = malloc(sizeof(*data.pipe) * 2 * (data.cmd_count - 1));
 	if (!data.pipe)
 	{
 		exit_error(ERROR, &data);
-		ft_putendl_fd("Pipe error", 2);
-	}	
+		ft_printf("Pipe error\n");
+	}
 	create_pipes(&data);
 	return (data);
 }

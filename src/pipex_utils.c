@@ -1,7 +1,7 @@
 
 #include "pipex.h"
 
-/* 
+/*
  * close_pipe_fds:
  *   Closes all file descriptors associated with the pipes used in pipex.
  *
@@ -15,8 +15,8 @@
 /**
  * Closes all file descriptors associated with the pipes used in pipex.
  *
- * This function iterates through the array of file descriptors stored in the 
- * `pipe` field of the `t_data` structure and closes each one. The number of 
+ * This function iterates through the array of file descriptors stored in the
+ * `pipe` field of the `t_data` structure and closes each one. The number of
  * file descriptors to close is determined by the number of commands minus one,
  * multiplied by two (since each pipe consists of two file descriptors).
  *
@@ -35,7 +35,7 @@ static void close_pipe_fds(t_data *data)
 	}
 }
 
-/* 
+/*
  * close_fds:
  *   Closes the input and output file descriptors, as well as any pipe file descriptors.
  *
@@ -69,7 +69,7 @@ void close_fds(t_data *data)
 
 
 
-/* 
+/*
  * exit_error:
  *   Handles the error situation by freeing allocated resources and closing file descriptors.
  *
@@ -89,11 +89,11 @@ void close_fds(t_data *data)
  * This function is called when an error is encountered. It ensures that all allocated resources
  * and open file descriptors are properly freed and closed to prevent memory leaks and other
  * resource-related issues. Additionally, if a heredoc was used in the program, it removes
- * the temporary file associated with it. After handling these cleanup tasks, the function 
+ * the temporary file associated with it. After handling these cleanup tasks, the function
  * terminates the program and returns the specified error status code.
  *
  * @param[in] error_status The exit status code to be returned upon program termination.
- * @param[in,out] data Pointer to the t_data structure containing allocated resources and 
+ * @param[in,out] data Pointer to the t_data structure containing allocated resources and
  * file descriptors. This structure is used to perform the necessary cleanup.
  */
 void exit_error(int error_status, t_data *data)
@@ -121,7 +121,7 @@ void exit_error(int error_status, t_data *data)
 }
 
 
-/* 
+/*
  * msg:
  *   Writes a formatted error message to standard error (stderr).
  *
@@ -152,7 +152,7 @@ int msg(char *str1, char *str2, char *str3, int erno)
 
 
 
-/* 
+/*
  * free_strs:
  *   Frees a single string and/or an array of strings.
  *
@@ -170,10 +170,10 @@ int msg(char *str1, char *str2, char *str3, int erno)
  * Frees a single string and/or an array of strings.
  *
  * This function is responsible for freeing a dynamically allocated string and
- * an array of dynamically allocated strings. It first checks if the provided 
- * single string is not NULL and frees it, then sets its pointer to NULL. 
+ * an array of dynamically allocated strings. It first checks if the provided
+ * single string is not NULL and frees it, then sets its pointer to NULL.
  * For the array of strings, it iterates through each element, frees each string,
- * and finally frees the array itself. The pointers for each freed string are 
+ * and finally frees the array itself. The pointers for each freed string are
  * also set to NULL to prevent dangling pointers.
  *
  * @param[in,out] str A single string to be freed.
@@ -207,23 +207,23 @@ int	invalid_args(int argc, char **argv, char **envp)
 	{
 		if (argc >= 2 && !ft_strncmp("here_doc", argv[1], 9))
 		{
-			ft_putendl_fd("Incorrect number of arguments.\nUsage:"
-				" ./pipex here_doc LIMITER cmd1 cmd2 ... cmdn outfile.", 2);
+			ft_printf("pipex: Incorrect number of arguments.\nUsage:"
+				" ./pipex here_doc LIMITER cmd1 cmd2 ... cmdn outfile.\n");
 			return (1);
 		}
-		ft_putendl_fd("Incorrect number of arguments.\nUsage:"
-			"./pipex infile cmd1 cmd2 ... cmdn outfile", 2);
+		ft_printf("pipex: Incorrect number of arguments.\nUsage:"
+			"./pipex infile cmd1 cmd2 ... cmdn outfile\n");
 		return (1);
 	}
 	else if (argc < 6 && !ft_strncmp("here_doc", argv[1], 9))
 	{
-		ft_putendl_fd("Incorrect number of arguments.\nUsage:"
-			"./pipex infile cmd1 cmd2 ... cmdn outfile", 2);
+		ft_printf("pipex: Incorrect number of arguments.\nUsage:"
+			"./pipex infile cmd1 cmd2 ... cmdn outfile\n");
 		return (1);
 	}
 	if (!envp || envp[0][0] == '\0')
 	{
-		ft_putendl_fd("envp error.", 2);
+		ft_printf("pipex: envp error.\n");
 		return (1);
 	}
 	return (0);
