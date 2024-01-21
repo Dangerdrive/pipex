@@ -1,0 +1,184 @@
+
+#include "pipex.h"
+
+/*
+ * close_pipe_fds:
+ *   Closes all file descriptors associated with the pipes used in pipex.
+ *
+ * Parameters:
+ *   data - Pointer to the t_data structure containing the pipe file descriptors.
+ *
+ * Functionality:
+ *   - Iterates through the pipe file descriptors array and closes each file descriptor.
+ */
+
+/**
+ * Closes all file descriptors associated with the pipes used in pipex.
+ *
+ * This function iterates through the array of file descriptors stored in the
+ * `pipe` field of the `t_data` structure and closes each one. The number of
+ * file descriptors to close is determined by the number of commands minus one,
+ * multiplied by two (since each pipe consists of two file descriptors).
+ *
+ * @param[in,out] data Pointer to a t_data structure containing the pipe file
+ * descriptors and the number of commands.
+ */
+static void close_pipe_fds(t_data *data)
+{
+	int	i;
+
+	i = 0;
+	while (i < (data->cmd_count - 1) * 2)
+	{
+		close(data->pipe[i]);
+		i++;
+	}
+}
+
+/*
+ * close_fds:
+ *   Closes the input and output file descriptors, as well as any pipe file descriptors.
+ *
+ * Parameters:
+ *   data - Pointer to the t_data structure containing the file descriptors.
+ *
+ * Functionality:
+ *   - Closes the input and output file descriptors if they are valid.
+ *   - Calls close_pipe_fds to close all pipe file descriptors.
+ */
+
+/**
+ * Closes all file descriptors used in the pipex process.
+ *
+ * This function is responsible for closing the input and output file descriptors,
+ * as well as all pipe file descriptors associated with the pipex process. It checks
+ * if the input and output file descriptors are valid (not equal to -1) before attempting
+ * to close them. The function then calls `close_pipe_fds` to close all pipe file descriptors.
+ *
+ * @param[in,out] data Pointer to a t_data structure that contains the file descriptors
+ * for input, output, and pipes.
+ */
+void close_fds(t_data *data)
+{
+	if (data->input_fd != -1)
+		close(data->input_fd);
+	if (data->output_fd != -1)
+		close(data->output_fd);
+	close_pipe_fds(data);
+}
+
+
+
+/*
+ * cleanup_n_exit:
+ *   Handles the error situation by freeing allocated resources and closing file descriptors.
+ *
+ * Parameters:
+ *   error_status - The exit status code to be returned.
+ *   data - Pointer to the t_data structure with allocated resources and file descriptors.
+ *
+ * Functionality:
+ *   - Closes open file descriptors and frees allocated memory.
+ *   - If heredoc was used, removes the temporary file.
+ *   - Exits the program with the given error status code.
+ */
+
+/**
+ * Handles error situations in the program by freeing allocated resources and closing file descriptors.
+ *
+ * This function is called when an error is encountered. It ensures that all allocated resources
+ * and open file descriptors are properly freed and closed to prevent memory leaks and other
+ * resource-related issues. Additionally, if a heredoc was used in the program, it removes
+ * the temporary file associated with it. After handling these cleanup tasks, the function
+ * terminates the program and returns the specified error status code.
+ *
+ * @param[in] error_status The exit status code to be returned upon program termination.
+ * @param[in,out] data Pointer to the t_data structure containing allocated resources and
+ * file descriptors. This structure is used to perform the necessary cleanup.
+ */
+void cleanup_n_exit(int error_status, t_data *data)
+{
+	if (data)
+	{
+		close_fds(data);
+		if (data->pipe)
+			free(data->pipe);
+		if (data->pids)
+			free(data->pids);
+		// if (data->cmd_options || data->cmd_path)
+		//   free_strs(data->cmd_path, data->cmd_options);
+		if (data->cmd_options)
+			free_strs(NULL, data->cmd_options);
+		if (data->cmd_path)
+		{
+			free(data->cmd_path);
+			data->cmd_path = NULL;
+		}
+	}
+	if (data->heredoc_flag == 1)
+		unlink(".heredoc.tmp");
+	exit(error_status);
+}
+
+/**
+ * Frees a single string and/or an array of strings.
+ *
+ * This function is responsible for freeing a dynamically allocated string and
+ * an array of dynamically allocated strings. It first checks if the provided
+ * single string is not NULL and frees it, then sets its pointer to NULL.
+ * For the array of strings, it iterates through each element, frees each string,
+ * and finally frees the array itself. The pointers for each freed string are
+ * also set to NULL to prevent dangling pointers.
+ *
+ * @param[in,out] str A single string to be freed.
+ * @param[in,out] strs An array of strings to be freed.
+ */
+void free_strs(char *str, char **strs)
+{
+	int i;
+
+	if (str)
+	{
+		free(str);
+		str = NULL;
+	}
+	if (strs)
+	{
+		i = 0;
+		while (strs[i])
+		{
+			free(strs[i]);
+			i++;
+		}
+		free(strs);
+		strs = NULL;
+	}
+}
+
+int	invalid_args(int argc, char **argv, char **envp)
+{
+	if (argc < 5)
+	{
+		if (argc >= 2 && !ft_strncmp("here_doc", argv[1], 9))
+		{
+			ft_putendl_fd("Incorrect number of arguments.\nUsage:"
+				" ./pipex here_doc LIMITER cmd1 cmd2 ... cmdn outfile.", 2);
+			return (1);
+		}
+		ft_putendl_fd("Incorrect number of arguments.\nUsage:"
+			"./pipex infile cmd1 cmd2 ... cmdn outfile", 2);
+		return (1);
+	}
+	else if (argc < 6 && !ft_strncmp("here_doc", argv[1], 9))
+	{
+		ft_putendl_fd("Incorrect number of arguments.\nUsage:"
+			"./pipex infile cmd1 cmd2 ... cmdn outfile", 2);
+		return (1);
+	}
+	if (!envp || envp[0][0] == '\0')
+	{
+		ft_putendl_fd("envp error.", 2);
+		return (1);
+	}
+	return (0);
+}
