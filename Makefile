@@ -18,8 +18,8 @@ INC	= -I ./includes/ -I $(LIBFT_PATH)/ -I $(FTPRINTF_PATH)/
 
 
 SRC = pipex.c \
-      env_parsing.c \
-      utils.c \
+     parse_envp.c \
+      pipex_utils.c \
       init.c \
       file_handler.c
 
@@ -41,7 +41,7 @@ all:
 	@$(MAKE) $(NAME)
 
 $(NAME): $(OBJS) $(LIBFT) $(FTPRINTF)
-	@$(CC) $(CFLAGS) $(OBJS) -o $@ -L$(LIBFT_PATH) -lft -L$(FTPRINTF_PATH) -lftprintf
+	@$(CC) $(CFLAGS) $(OBJS) -o $@ -L$(FTPRINTF_PATH) -lftprintf -L$(LIBFT_PATH) -lft
 	@echo  "\n✅ $(BOLD)Pipex compiled$(NO_FORMAT)"
 
 $(LIBFT):

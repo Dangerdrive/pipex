@@ -1,7 +1,7 @@
 my program/project is divided into 5 files:
 env_parsing.c
 file_handler.c
-init.c
+data_init.c
 pipex.c
 utils.c
 
@@ -300,7 +300,7 @@ void get_heredoc(t_data *data)
 
 
 
-//init.c
+//data_init.c
 
 /* 
  * clean_init:
@@ -360,7 +360,7 @@ static void generate_pipes(t_data *data)
 
 
 /* 
- * init:
+ * data_init:
  *   Initializes a t_data structure for pipex, sets up input and output file descriptors, 
  *   and allocates necessary resources for pipes and process IDs.
  *
@@ -380,7 +380,7 @@ static void generate_pipes(t_data *data)
  *   - Generates the required pipes using generate_pipes.
  *   - Exits with an error message if any memory allocation fails.
  */
-t_data init(int ac, char **av, char **envp)
+t_data data_init(int ac, char **av, char **envp)
 {
     t_data data;
 
@@ -651,7 +651,7 @@ int main(int ac, char **av, char **envp)
 		exit_error(msg("Unexpected error.", "", "", 1), &data);
 
 	// Initialize data structure and start the pipex process
-	data = init(ac, av, envp);
+	data = data_init(ac, av, envp);
 	exit_code = pipex(&data);
 
 	// Return the exit code from pipex

@@ -97,18 +97,17 @@ static void execute_child_process(t_data *data)
 		// Middle child: Use the read-end of the current pipe and the write-end of the next pipe
 		redirect_io(data->pipe[2 * data->child - 2], data->pipe[2 * data->child + 1], data);
 	}
-
 	// Close file descriptors that are no longer needed
 	close_fds(data);
-
 	// Check if the command and its options are valid
 	if (data->cmd_options == NULL || data->cmd_path == NULL) {
-		exit_error(1, data); // Consider using a specific error message or code
+		exit_error(ERROR, data); // Consider using a specific error message or code
 	}
-
 	// Execute the command
-	if (execve(data->cmd_path, data->cmd_options, data->envp) == -1) {
-		exit_error(msg(data->cmd_options[0], ": ", strerror(errno), 1), data);
+	if (execve(data->cmd_path, data->cmd_options, data->envp) == -1)
+	{
+		exit_error(ERROR, data);
+		ft_printf("%s: %s\n", data->cmd_options[0], strerror(errno));
 	}
 }
 
@@ -242,32 +241,44 @@ static int pipex(t_data *data)
  *
  * @return The exit code of the last command executed by Pipex, or an error code in case of invalid input or setup failure.
  */
+// int main(int argc, char **argv, char **envp)
+// {
+// 	t_data data;
+// 	int exit_code;
+
+// 	if (argc < 5)
+// 	{
+// 		if (argc >= 2 && !ft_strncmp("here_doc", argv[1], 9))
+// 			return (msg("Usage: ", "./pipex here_doc LIMITER cmd1 cmd2 ... cmdn file2.", "", 1));
+// 		return (msg("Usage: ", "./pipex file1 cmd1 cmd2 ... cmdn file2.", "", 1));
+// 	}
+// 	else if (argc < 6 && !ft_strncmp("here_doc", argv[1], 9))
+// 		return (msg("Usage: ", "./pipex here_doc LIMITER cmd1 cmd2 ... cmdn file2.", "", 1));
+// 	if (!envp || envp[0][0] == '\0')
+// 		exit_error(msg("Unexpected error.", "", "", 1), &data);
+// 	data = init(argc, argv, envp);
+// 	exit_code = pipex(&data);
+
+// 	return (exit_code);
+// }
+
 int main(int argc, char **argv, char **envp)
 {
 	t_data data;
 	int exit_code;
 
-	if (argc < 5)
-	{
-		if (argc >= 2 && !ft_strncmp("here_doc", argv[1], 9))
-			return (msg("Usage: ", "./pipex here_doc LIMITER cmd1 cmd2 ... cmdn file2.", "", 1));
-		return (msg("Usage: ", "./pipex file1 cmd1 cmd2 ... cmdn file2.", "", 1));
-	}
-	else if (argc < 6 && !ft_strncmp("here_doc", argv[1], 9))
-		return (msg("Usage: ", "./pipex here_doc LIMITER cmd1 cmd2 ... cmdn file2.", "", 1));
-	if (!envp || envp[0][0] == '\0')
-		exit_error(msg("Unexpected error.", "", "", 1), &data);
-	data = init(argc, argv, envp);
+	exit_code = -1;
+	if (invalid_args(argc, argv, envp))
+		return (1);
+	data = init_data(argc, argv, envp);
 	exit_code = pipex(&data);
-
 	return (exit_code);
 }
 
 
-
 //checar refs do msgs e trocar função
 
-
+//retirar msg e colocar 1 no lugar, printando a msg no lugar
 
 
 

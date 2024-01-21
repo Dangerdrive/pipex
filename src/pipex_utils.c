@@ -132,7 +132,11 @@ void exit_error(int error_status, t_data *data)
  * Returns:
  *   The provided error code (erno).
  *
- * Functionality:
+ * Functionality:$(NAME): $(OBJS) $(LIBFT) $(FTPRINTF)
+	@$(CC) $(CFLAGS) $(OBJS) -o $@ -L$(LIBFT_PATH) -lft -L$(FTPRINTF_PATH) -lftprintf
+	@echo  "\n✅ $(BOLD)Pipex compiled$(NO_FORMAT)"$(NAME): $(OBJS) $(LIBFT) $(FTPRINTF)
+	@$(CC) $(CFLAGS) $(OBJS) -o $@ -L$(LIBFT_PATH) -lft -L$(FTPRINTF_PATH) -lftprintf
+	@echo  "\n✅ $(BOLD)Pipex compiled$(NO_FORMAT)"
  *   - Concatenates the given strings and prints them to stderr.
  */
 int msg(char *str1, char *str2, char *str3, int erno)
@@ -197,3 +201,30 @@ void free_strs(char *str, char **strs)
 	}
 }
 
+int	invalid_args(int argc, char **argv, char **envp)
+{
+	if (argc < 5)
+	{
+		if (argc >= 2 && !ft_strncmp("here_doc", argv[1], 9))
+		{
+			ft_putendl_fd("Incorrect number of arguments.\nUsage:"
+				" ./pipex here_doc LIMITER cmd1 cmd2 ... cmdn outfile.", 2);
+			return (1);
+		}
+		ft_putendl_fd("Incorrect number of arguments.\nUsage:"
+			"./pipex infile cmd1 cmd2 ... cmdn outfile", 2);
+		return (1);
+	}
+	else if (argc < 6 && !ft_strncmp("here_doc", argv[1], 9))
+	{
+		ft_putendl_fd("Incorrect number of arguments.\nUsage:"
+			"./pipex infile cmd1 cmd2 ... cmdn outfile", 2);
+		return (1);
+	}
+	if (!envp || envp[0][0] == '\0')
+	{
+		ft_putendl_fd("envp error.", 2);
+		return (1);
+	}
+	return (0);
+}

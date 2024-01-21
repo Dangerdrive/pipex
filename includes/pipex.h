@@ -6,12 +6,14 @@
 /*   By: fde-alen <fde-alen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/07 22:36:23 by fde-alen          #+#    #+#             */
-/*   Updated: 2024/01/19 20:42:41 by fde-alen         ###   ########.fr       */
+/*   Updated: 2024/01/20 20:22:35 by fde-alen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PIPEX_H
 # define PIPEX_H
+
+# define ERROR 1
 
 # include <stdlib.h>
 # include <stdio.h>
@@ -22,8 +24,9 @@
 # include <unistd.h>
 # include <sys/wait.h>
 
-# include "../libs/libft/libft.h"
 # include "../libs/ft_printf/ft_printf.h"
+# include "../libs/libft/libft.h"
+
 
 /*  Data    */
 typedef struct s_data
@@ -43,7 +46,7 @@ typedef struct s_data
 }		t_data;
 
 /*  initialization.c    */
-t_data	init(int ac, char **av, char **envp);
+t_data	init_data(int ac, char **av, char **envp);
 
 /*  env_parsing.c   */
 char	*get_cmd(char *cmd, t_data *data);
@@ -53,12 +56,14 @@ void	exit_error(int error_status, t_data *data);
 int		msg(char *str1, char *str2, char *str3, int erno);
 void	close_fds(t_data *data);
 void	free_strs(char *str, char **strs);
+int		invalid_args(int argc, char **argv, char **envp);
+
 
 
 /* file_handler.c */
 void	get_input_file(t_data *data);
 void	get_output_file(t_data *data);
-void	handle_heredoc(t_data *data);
+//void	handle_heredoc(t_data *data);
 
 /*functions from libft*/
 /*ft_putchar_fd

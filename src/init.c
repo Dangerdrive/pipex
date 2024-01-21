@@ -1,18 +1,6 @@
 
 #include "pipex.h"
 
-/* 
- * initialize_data:
- *   Initializes and returns a t_data structure with default values.
- *
- * Returns:
- *   An initialized t_data structure with all fields set to their default state.
- *   String pointers are set to NULL and integer values are set to -1.
- *
- * Notes:
- *   - The function sets file descriptors and other integral fields to -1, 
- *	 as 0 is a valid file descriptor and should not be used for initialization.
- */
 
 /**
  * Initializes the t_data structure with default values.
@@ -65,7 +53,10 @@ static void create_pipes(t_data *data)
 	while (i < data->cmd_count - 1)
 	{
 		if (pipe(data->pipe + 2 * i) == -1)
-			exit_error(msg("Could not create pipe", "", "", 1), data);
+		{
+			exit_error(ERROR, data);
+			ft_putendl_fd("Could not create pipe", 2);
+		}	
 		i++;
 	}
 }
@@ -92,7 +83,7 @@ static void create_pipes(t_data *data)
  *   - Generates the required pipes using create_pipes.
  *   - Exits with an error message if any memory allocation fails.
  */
-t_data init(int ac, char **av, char **envp)
+t_data init_data(int ac, char **av, char **envp)
 {
 	t_data data;
 
@@ -102,19 +93,18 @@ t_data init(int ac, char **av, char **envp)
 	data.av = av;
 	if (!ft_strncmp("here_doc", av[1], 9))
 		data.heredoc_flag = 1;
-
 	get_input_file(&data);
 	get_output_file(&data);
-
 	data.cmd_count = ac - 3 - data.heredoc_flag;
 	data.pids = malloc(sizeof(*data.pids) * data.cmd_count);
 	if (!data.pids)
 		exit_error(msg("PID error", strerror(errno), "", 1), &data);
-
 	data.pipe = malloc(sizeof(*data.pipe) * 2 * (data.cmd_count - 1));
 	if (!data.pipe)
-		exit_error(msg("Pipe error", "", "", 1), &data);
-
+	{
+		exit_error(ERROR, &data);
+		ft_putendl_fd("Pipe error", 2);
+	}	
 	create_pipes(&data);
 	return (data);
 }
