@@ -182,7 +182,7 @@ static char *get_cmd_path(char *cmd, char **paths)
 		if (!cmd_path)
 		{
 			free_strs(NULL, paths);
-			ft_printf("pipex: cmd_path error\n");
+			ft_printf("pipex:\n\t cmd_path error\n");
 			cleanup_n_exit(ERROR, NULL);
 		}
 		if (access(cmd_path, F_OK | X_OK) == 0)

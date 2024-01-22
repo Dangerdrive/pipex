@@ -1,4 +1,4 @@
-For me, one thing that made it more difficult was a lack of understandment of unix processes. It was not that hard to understand pipes, 
+For me, one thing that made it more difficult was a lack of understandment of unix processes. It was not that hard to understand pipes,
 
 ```c
 int main(int argc, char **argv, char **envp)
@@ -14,7 +14,7 @@ execve() is a system call used to execute a program. It replaces the current pro
 Path: The file path to the executable you want to run. For example, /bin/ls.
 Arguments (argv): An array of strings passed as arguments to the program. The first argument is typically the name of the program.
 Environment (envp): An array of strings that represent the environment settings. These are typically a colon-separated list of directories.
-For example: 
+For example:
 ```echo $PATH```
 ```/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin```
 Each directory in this list is a place where your system will search for executable files when you type a command.
@@ -125,3 +125,48 @@ Something else
 Line 2
 EOF
 This will use grep to filter out lines that contain the word "Line".
+
+
+
+
+
+
+void get_input_file(t_data *data)
+{
+	if (data->heredoc_flag == 1)
+	{
+		handle_heredoc(data);
+		data->input_fd = open(".heredoc.tmp", O_RDONLY);
+		if (data->input_fd == -1)
+		{
+			ft_printf("pipex:\n\t here_doc: %s\n", strerror(errno));
+			cleanup_n_exit(ERROR, data);
+		}
+	}
+	else
+	{
+		data->input_fd = open(data->av[1], O_RDONLY, 644);
+		if (data->input_fd == -1)
+		{
+			ft_printf("pipex:\n\t %s: %s\n", strerror(errno), data->av[1]);
+			cleanup_n_exit(ERROR, data);//this one was added
+		}
+	}
+}
+
+
+void get_output_file(t_data *data)
+{
+	if (data->heredoc_flag == 1)
+		data->output_fd = open(data->av[data->ac - 1],
+			O_WRONLY | O_CREAT | O_APPEND, 0644);
+	else
+		data->output_fd = open(data->av[data->ac - 1],
+			O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (data->output_fd == -1)
+	{
+		cleanup_n_exit(ERROR, data);// this one was added
+		ft_printf("pipex:\n\t %s: %s\n",
+			strerror(errno), data->av[data->ac - 1]);
+	}
+}

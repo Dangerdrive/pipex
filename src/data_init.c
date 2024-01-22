@@ -1,7 +1,6 @@
 
 #include "pipex.h"
 
-
 /**
  * Initializes the t_data structure with default values.
  *
@@ -33,17 +32,18 @@ static t_data initialize_data(void)
 	return (data);
 }
 
-/*
- * create_pipes:
- *   Creates the necessary number of pipes for inter-process communication in pipex.
+/**
+ * Creates pipe file descriptors for inter-process communication in pipex.
  *
- * Parameters:
- *   data - Pointer to the t_data structure containing the number of commands and the pipe array.
+ * This function is responsible for setting up the necessary pipes for the pipex
+ * program. It iterates through the required number of pipes, which is one less
+ * than the command count, and creates each pipe. The file descriptors for each
+ * pipe are stored in the 'pipe' field of the t_data structure. If a pipe
+ * creation fails, the function prints an error message and exits the program
+ * after performing cleanup.
  *
- * Functionality:
- *   - Iterates over the number of required pipes and creates each using the pipe system call.
- *   - Stores the file descriptors for each pipe in the pipe array within the data structure.
- *   - Exits with an error message if pipe creation fails.
+ * @param[in,out] data Pointer to a t_data structure containing the command
+ *                     count and the array to store pipe file descriptors.
  */
 static void create_pipes(t_data *data)
 {
@@ -54,34 +54,28 @@ static void create_pipes(t_data *data)
 	{
 		if (pipe(data->pipe + 2 * i) == -1)
 		{
+			ft_printf("pipex:\n\t Could not create pipe: %s\n"
+				, strerror(errno));
 			cleanup_n_exit(ERROR, data);
-			ft_putendl_fd("Could not create pipe", 2);
 		}
 		i++;
 	}
 }
 
-
-/*
- * init:
- *   Initializes a t_data structure for pipex, sets up input and output file descriptors,
- *   and allocates necessary resources for pipes and process IDs.
+/**
+ * Initializes the t_data structure for the pipex program.
  *
- * Parameters:
- *   ac - Argument count.
- *   av - Argument vector.
- *   envp - Environment variables.
+ * This function initializes and sets up the t_data structure, which is used
+ * throughout the pipex program. It stores command line arguments, environment
+ * variables, and sets flags for 'here_doc' functionality. The function also
+ * allocates memory for storing process IDs (pids) and pipe file descriptors,
+ * handles input and output file setup, and creates the necessary pipes for
+ * inter-process communication.
  *
- * Returns:
- *   An initialized t_data structure ready for use in pipex.
- *
- * Functionality:
- *   - Calls initialize_data to initialize the data structure.
- *   - Sets up the environment, arguments, and here_doc flag.
- *   - Opens input and output files using get_input_file and get_output_file.
- *   - Allocates memory for pipes and process IDs.
- *   - Generates the required pipes using create_pipes.
- *   - Exits with an error message if any memory allocation fails.
+ * @param[in] ac The count of command line arguments.
+ * @param[in] av Array of command line argument strings.
+ * @param[in] envp Array of environment variable strings.
+ * @return An initialized t_data structure.
  */
 t_data init_data(int ac, char **av, char **envp)
 {
@@ -99,14 +93,14 @@ t_data init_data(int ac, char **av, char **envp)
 	data.pids = malloc(sizeof(*data.pids) * data.cmd_count);
 	if (!data.pids)
 	{
+		ft_printf("pipex:\n\t PID error: %s\n", strerror(errno));
 		cleanup_n_exit(ERROR, &data);
-		ft_printf("pipex: PID error: %s\n", strerror(errno));
 	}
 	data.pipe = malloc(sizeof(*data.pipe) * 2 * (data.cmd_count - 1));
 	if (!data.pipe)
 	{
+		ft_printf("pipex:\n\t Pipe error: %s\n", strerror(errno));
 		cleanup_n_exit(ERROR, &data);
-		ft_printf("pipex: Pipe error: %s\n", strerror(errno));
 	}
 	create_pipes(&data);
 	return (data);
