@@ -6,14 +6,15 @@
 /*   By: fde-alen <fde-alen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/17 20:15:11 by fde-alen          #+#    #+#             */
-/*   Updated: 2024/01/19 18:01:53 by fde-alen         ###   ########.fr       */
+/*   Updated: 2024/01/22 00:10:15 by fde-alen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 
 /**
- * Prints an unsigned integer in hexadecimal format to the specified file descriptor.
+* Prints an unsigned integer in hexadecimal format to the specified file
+* descriptor.
  *
  * Converts the number to a hexadecimal string using either lowercase ('x') or
  * uppercase ('X') characters. If the flag '#' is provided and the number is

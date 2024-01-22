@@ -1,21 +1,34 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   data_init.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: fde-alen <fde-alen@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/01/22 00:39:33 by fde-alen          #+#    #+#             */
+/*   Updated: 2024/01/22 03:04:55 by fde-alen         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "pipex.h"
 
 /**
  * Initializes the t_data structure with default values.
  *
- * This function is responsible for setting initial values for all fields in the t_data structure.
- * It sets pointers to NULL, file descriptors to -1, and integer values to 0 or -1 as appropriate.
- * This initialization is crucial to ensure that the data structure starts in a known state,
- * preventing undefined behavior from uninitialized values. The initialized structure is used to manage
- * various aspects of the pipex program, such as environment variables, command arguments, file descriptors,
- * and child process management.
+ * This function is responsible for setting initial values for all fields in the
+ * t_data structure. It sets pointers to NULL, file descriptors to -1, and
+ * integer values to 0 or -1 as appropriate. This initialization is crucial to
+ * ensure that the data structure starts in a known state, preventing undefined
+ * behavior from uninitialized values. The initialized structure is used to
+ * manage various aspects of the pipex program, such as environment variables,
+ * command arguments, file descriptors, and child process management.
  *
- * @return An instance of t_data structure with all fields initialized to default values.
+ * @return An instance of t_data structure with all fields initialized to default
+ *         values.
  */
-static t_data initialize_data(void)
+static t_data	initialize_data(void)
 {
-	t_data data;
+	t_data	data;
 
 	data.envp = NULL;
 	data.ac = -1;
@@ -45,17 +58,17 @@ static t_data initialize_data(void)
  * @param[in,out] data Pointer to a t_data structure containing the command
  *                     count and the array to store pipe file descriptors.
  */
-static void create_pipes(t_data *data)
+static void	create_pipes(t_data *data)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (i < data->cmd_count - 1)
 	{
 		if (pipe(data->pipe + 2 * i) == -1)
 		{
-			ft_printf("pipex:\n\t Could not create pipe: %s\n"
-				, strerror(errno));
+			ft_printf("pipex: Could not create pipe: %s\n",
+				strerror(errno));
 			cleanup_n_exit(ERROR, data);
 		}
 		i++;
@@ -77,9 +90,9 @@ static void create_pipes(t_data *data)
  * @param[in] envp Array of environment variable strings.
  * @return An initialized t_data structure.
  */
-t_data init_data(int ac, char **av, char **envp)
+t_data	init_data(int ac, char **av, char **envp)
 {
-	t_data data;
+	t_data	data;
 
 	data = initialize_data();
 	data.envp = envp;
@@ -93,13 +106,13 @@ t_data init_data(int ac, char **av, char **envp)
 	data.pids = malloc(sizeof(*data.pids) * data.cmd_count);
 	if (!data.pids)
 	{
-		ft_printf("pipex:\n\t PID error: %s\n", strerror(errno));
+		ft_printf("pipex: PID error: %s\n", strerror(errno));
 		cleanup_n_exit(ERROR, &data);
 	}
 	data.pipe = malloc(sizeof(*data.pipe) * 2 * (data.cmd_count - 1));
 	if (!data.pipe)
 	{
-		ft_printf("pipex:\n\t Pipe error: %s\n", strerror(errno));
+		ft_printf("pipex: Pipe error: %s\n", strerror(errno));
 		cleanup_n_exit(ERROR, &data);
 	}
 	create_pipes(&data);

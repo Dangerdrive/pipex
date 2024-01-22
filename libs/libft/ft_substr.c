@@ -6,7 +6,7 @@
 /*   By: fde-alen <fde-alen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/08 18:30:37 by fde-alen          #+#    #+#             */
-/*   Updated: 2024/01/10 21:28:57 by fde-alen         ###   ########.fr       */
+/*   Updated: 2024/01/22 00:29:32 by fde-alen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,17 +15,15 @@
 /**
  * Extracts a substring from a string.
  *
- * This function creates a new string which is a substring of 'str'. The substring
- * begins at the index 'start' and has a maximum length of 'len'. If 'start' is greater
- * than the length of 'str', an empty string is returned. If 'len' exceeds the length
- * of 'str' starting from 'start', the substring extends to the end of 'str'. Memory for
- * the new string is obtained with malloc, and needs to be freed by the caller.
+ * Creates a new string that's a substring of 'str', starting at 'start'
+ * with max length 'len'. If 'start' > str length, returns empty string.
+ * If 'len' exceeds remaining str, substring extends to end of 'str'.
+ * Memory allocated with malloc; caller must free it.
  *
- * @param[in] str The source string from which to extract the substring.
- * @param[in] start The start index of the substring in 'str'.
- * @param[in] len The maximum length of the substring.
- *
- * @return A pointer to the newly created substring, or NULL if the allocation fails.
+ * @param str The source string.
+ * @param start The start index of the substring.
+ * @param len The maximum length of the substring.
+ * @return A pointer to the newly created substring, or NULL if allocation fails.
  */
 char	*ft_substr(char const *str, unsigned int start, size_t len)
 {

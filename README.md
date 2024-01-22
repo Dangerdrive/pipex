@@ -139,7 +139,7 @@ void get_input_file(t_data *data)
 		data->input_fd = open(".heredoc.tmp", O_RDONLY);
 		if (data->input_fd == -1)
 		{
-			ft_printf("pipex:\n\t here_doc: %s\n", strerror(errno));
+			ft_printf("pipex: here_doc: %s\n", strerror(errno));
 			cleanup_n_exit(ERROR, data);
 		}
 	}
@@ -148,7 +148,7 @@ void get_input_file(t_data *data)
 		data->input_fd = open(data->av[1], O_RDONLY, 644);
 		if (data->input_fd == -1)
 		{
-			ft_printf("pipex:\n\t %s: %s\n", strerror(errno), data->av[1]);
+			ft_printf("pipex: %s: %s\n", strerror(errno), data->av[1]);
 			cleanup_n_exit(ERROR, data);//this one was added
 		}
 	}
@@ -166,7 +166,7 @@ void get_output_file(t_data *data)
 	if (data->output_fd == -1)
 	{
 		cleanup_n_exit(ERROR, data);// this one was added
-		ft_printf("pipex:\n\t %s: %s\n",
+		ft_printf("pipex: %s: %s\n",
 			strerror(errno), data->av[data->ac - 1]);
 	}
 }

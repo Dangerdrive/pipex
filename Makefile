@@ -2,7 +2,7 @@
 MAKEFLAGS	+=	--no-print-directory
 
 CC			=	cc
-CFLAGS		=	-Werror -Wextra -Wall -Ilibft -Ift_printf
+CFLAGS		=	-Werror -Wextra -Wall -g -Ilibft -Ift_printf
 NAME		=	pipex
 
 SRC_PATH	=	src/
@@ -34,7 +34,7 @@ OBJS		=	$(addprefix $(OBJ_PATH), $(OBJ))
 $(OBJ_PATH)%.o:$(SRC_PATH)%.c
 	@mkdir -p $(OBJ_PATH)
 	@$(CC) $(CFLAGS) -c $< -o $@ $(INC)
-	@echo "$(BOLD)✔️ Compiling $<$(NO_FORMAT)"
+	@echo "$(BOLD)✔️	Compiling $<...$(NO_FORMAT)"
 
 all:
 	@echo ""
@@ -46,11 +46,11 @@ $(NAME):$(OBJS) $(LIBFT) $(FTPRINTF)
 
 $(LIBFT):
 	@make -C $(LIBFT_PATH) all
-	@echo "\n✔️	$(BOLD)Libft compiled$(NO_FORMAT)"
+	@echo "\n✔️	$(BOLD)Libft compiled...$(NO_FORMAT)"
 
 $(FTPRINTF):
 	@make -C $(FTPRINTF_PATH) all
-	@echo	"\n✔️	$(BOLD)ft_printf compiled$(NO_FORMAT)"
+	@echo	"\n✔️	$(BOLD)ft_printf compiled...$(NO_FORMAT)"
 
 bonus: all
 

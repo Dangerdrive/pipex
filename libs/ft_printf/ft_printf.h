@@ -6,7 +6,7 @@
 /*   By: fde-alen <fde-alen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/17 21:09:15 by fde-alen          #+#    #+#             */
-/*   Updated: 2024/01/19 19:23:01 by fde-alen         ###   ########.fr       */
+/*   Updated: 2024/01/22 00:14:01 by fde-alen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,10 @@
 // # define STDOUT_FILENO (1)
 // # define STDERR_FILENO (2)
 
-# define NO_FLAG (0)
+# define NO_FLAG 0
 
 //pick output file descriptor
-# define FD (STDERR_FILENO)
+# define FD 2
 
 # include <stdio.h>
 # include <unistd.h>

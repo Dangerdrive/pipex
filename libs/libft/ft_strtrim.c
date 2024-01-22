@@ -6,7 +6,7 @@
 /*   By: fde-alen <fde-alen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/08 18:34:18 by fde-alen          #+#    #+#             */
-/*   Updated: 2024/01/11 16:57:16 by fde-alen         ###   ########.fr       */
+/*   Updated: 2024/01/22 00:30:02 by fde-alen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,8 @@
  * Checks if a character is part of a given set.
  *
  * @param[in] c The character to be checked.
- * @param[in] set A null-terminated string representing the set of characters to check against.
+ * @param[in] set A null-terminated string representing the set of
+ * characters to check against.
  *
  * @return 1 if the character is found in the set, 0 otherwise.
  */
@@ -35,7 +36,8 @@ static int	is_set_char(char c, const char *set)
  * Trims the beginning and end of a string by removing specified characters.
  *
  * @param[in] s1 The string to be trimmed.
- * @param[in] set A null-terminated string representing the set of characters to be trimmed.
+ * @param[in] set A null-terminated string representing the set of characters
+ * to be trimmed.
  *
  * @return A newly allocated string with the specified characters removed from
  *         the beginning and end of the original string. Returns NULL if memory

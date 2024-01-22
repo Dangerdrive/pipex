@@ -6,7 +6,7 @@
 /*   By: fde-alen <fde-alen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/08 18:26:40 by fde-alen          #+#    #+#             */
-/*   Updated: 2024/01/10 21:46:10 by fde-alen         ###   ########.fr       */
+/*   Updated: 2024/01/22 00:28:16 by fde-alen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,8 @@
  * @param[in] s1 The prefix string.
  * @param[in] s2 The suffix string.
  *
- * @return A pointer to the newly created string, or NULL if memory allocation fails.
+ * @return A pointer to the newly created string, or NULL if memory allocation
+ * fails.
  */
 char	*ft_strjoin(char const *s1, char const *s2)
 {

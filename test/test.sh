@@ -254,3 +254,46 @@ if [ $LEAK_TOGGLE -eq 1 ]; then
     printf "Leak check:${CYAN}\n"
     $VALGRIND ./pipex $INPUT "cat" "grep PATH" "wc -l" $OUTPUT_PIPEX
 fi
+
+printf "${YELLOW}${BOLD}\n========= BONUS TEST 3 ===========\n${NC}"
+printf "Handling here_doc.\n"
+printf "Shell command: ${BOLD}${BLUE}<$INPUT cat | grep PATH | grep usr/ | wc -c > $OUTPUT_EXPECTED\n${NC}${YELLOW}"
+<$INPUT cat | grep PATH | grep usr/ | wc -c > $OUTPUT_EXPECTED
+printf "${NC}Pipex command: ${BOLD}${BLUE}./pipex $INPUT \"cat\" \"grep PATH\" \"grep usr/\" \"wc -c\" $OUTPUT_PIPEX${NC}\n${YELLOW}"
+./pipex $INPUT "cat" "grep PATH" "grep usr/" "wc -c" $OUTPUT_PIPEX
+printf "${NC}Output file: "
+if cmp -s $OUTPUT_EXPECTED $OUTPUT_PIPEX; then
+    printf "${GREEN}${BOLD}OK!${NC}\n"
+else
+    printf "${RED}${BOLD}KO: Output differs${NC}:\n"
+    diff --color -c $OUTPUT_EXPECTED $OUTPUT_PIPEX
+fi
+if [ $LEAK_TOGGLE -eq 1 ]; then
+    printf "Leak check:${CYAN}\n"
+    $VALGRIND ./pipex $INPUT "cat" "grep PATH" "wc -l" $OUTPUT_PIPEX
+fi
+
+printf "${YELLOW}${BOLD}\n========= BONUS TEST 3 ===========\n${NC}"
+printf "here_doc bonus: check for an extra prompt line after LIMITER is given as input.\n"
+printf "Shell command: ${BOLD}${BLUE}(cat << LIMITER\nThis is a test\nLIMITER) > $OUTPUT_EXPECTED\n${NC}${YELLOW}"
+(cat << LIMITER
+This is a test
+LIMITER
+) > $OUTPUT_EXPECTED
+printf "${NC}Pipex command: ${BOLD}${BLUE}echo -e \"This is a test\nLIMITER\" | ./pipex here_doc LIMITER \"cat\" \"wc -l\" $OUTPUT_PIPEX > prompt_output.txt${NC}\n${YELLOW}"
+echo -e "This is a test\nLIMITER" | ./pipex here_doc LIMITER "cat" "wc -l" $OUTPUT_PIPEX > prompt_output.txt
+printf "${NC}Output file: "
+if cmp -s $OUTPUT_EXPECTED $OUTPUT_PIPEX; then
+    printf "${GREEN}${BOLD}OK!${NC}\n"
+else
+    printf "${RED}${BOLD}KO: Output differs${NC}:\n"
+    diff --color -c $OUTPUT_EXPECTED $OUTPUT_PIPEX
+fi
+printf "${NC}Prompt output: "
+PROMPT_COUNT=$(grep -c "here_doc >" prompt_output.txt)
+if [ "$PROMPT_COUNT" -eq "1" ]; then
+    printf "${GREEN}${BOLD}OK! Correct number of prompt lines.${NC}\n"
+else
+    printf "${RED}${BOLD}KO: Incorrect number of prompt lines. Expected 1, found $PROMPT_COUNT.${NC}\n"
+fi
+rm -f prompt_output.txt
