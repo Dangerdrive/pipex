@@ -6,7 +6,7 @@
 /*   By: fde-alen <fde-alen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/22 00:39:14 by fde-alen          #+#    #+#             */
-/*   Updated: 2024/01/22 04:55:37 by fde-alen         ###   ########.fr       */
+/*   Updated: 2024/01/22 04:57:13 by fde-alen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,39 +146,6 @@ static int	execute_parent_process(t_data *data)
  *
  * @return The exit code of the last child process in the pipeline.
  */
-// static int	pipex(t_data *data)
-// {
-// 	int	exit_code;
-
-// 	if (pipe(data->pipe) == -1)
-// 		cleanup_n_exit(ft_printf("pipex: pipe: %s\n", strerror(errno)),
-// 			data);
-// 	data->child = 0;
-// 	while (data->child < data->cmd_count)
-// 	{
-// 		data->cmd_options = ft_split(data->av[data->child + 2 + data->heredoc_flag], ' ');
-// 		if (!data->cmd_options)
-// 			cleanup_n_exit(ft_printf("pipex: cmd_options error: %s\n",
-// 					strerror(errno)), data);
-// 		data->cmd_path = get_cmd(data->cmd_options[0], data);
-// 		data->pids[data->child] = fork();
-// 		if (data->pids[data->child] == -1)
-// 		cleanup_n_exit(ft_printf("pipex: fork error: %s\n",
-// 			strerror(errno)), data);
-// 		else if (data->pids[data->child] == 0)
-// 			execute_child_process(data);
-// //		free_strs(data->cmd_path, data->cmd_options);
-// 		free(data->cmd_path);
-// 		data->cmd_path = NULL;
-// 		free_array(data->cmd_options);
-// 		data->child++;
-// 	}
-// 	exit_code = execute_parent_process(data);
-// 	if (data->heredoc_flag == 1)
-// 		unlink(".heredoc.tmp");
-// 	return (exit_code);
-// }
-
 static int	pipex(t_data *d)
 {
 	int	exit_code;
